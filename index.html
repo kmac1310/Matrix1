@@ -1,0 +1,89 @@
+<!-- Matrix Digital Rain Effect -->
+<style>
+    /* Ensure the gadget container covers the entire viewport */
+    .matrix-wrapper {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1; /* Ensure it stays behind other content */
+        background-color: black; /* Background color for the rain effect */
+        overflow: hidden;
+    }
+
+    /* Matrix rain canvas */
+    #matrix-bg {
+        display: block;
+    }
+</style>
+
+<div class="matrix-wrapper">
+    <canvas id="matrix-bg"></canvas>
+</div>
+
+<script>
+    (function() {
+        // Matrix rain effect
+        const canvas = document.getElementById('matrix-bg');
+        const ctx = canvas.getContext('2d');
+
+        // Set canvas size to fill the window
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        // Initialize canvas size and add resize listener
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        // Matrix characters (mix of numbers, letters, and special characters)
+        const matrixChars = '1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ1440:時間₿@#$%^&*';
+        const drops = [];
+        const fontSize = 16; // Adjust for density of rain
+        const columns = Math.floor(canvas.width / fontSize);
+
+        // Initialize drops
+        for (let i = 0; i < columns; i++) {
+            drops[i] = Math.random() * -100;
+        }
+
+        function drawMatrix() {
+            // Semi-transparent black to create trail effect
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.08)'; // Adjust opacity for trail length
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Set the text style
+            ctx.font = fontSize + 'px monospace';
+
+            // Draw the characters
+            for (let i = 0; i < drops.length; i++) {
+                // Random character
+                const char = matrixChars[Math.floor(Math.random() * matrixChars.length)];
+
+                // Randomly choose color between Matrix green and blue
+                const color = Math.random() < 0.8 ? '#00FF41' : '#007FFF';
+                const alpha = Math.random() * 0.5 + 0.5; // Dynamic opacity
+                ctx.globalAlpha = alpha;
+                ctx.fillStyle = color;
+
+                // Draw the character
+                ctx.fillText(char, i * fontSize, drops[i] * fontSize);
+
+                // Reset drop back to top with random delay when it reaches bottom
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) { // Adjust probability for reset
+                    drops[i] = 0;
+                }
+
+                // Move drop down
+                drops[i]++;
+            }
+
+            requestAnimationFrame(drawMatrix);
+        }
+
+        // Start the matrix effect
+        drawMatrix();
+    })();
+</script>
